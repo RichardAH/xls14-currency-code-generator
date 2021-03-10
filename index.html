@@ -1,0 +1,81 @@
+<html>
+    <head>
+        <title>XLS15d CTI lookup</title>
+    </head>
+    <body>
+    <script>
+function
+cti_transaction_index(
+    cti)
+{
+    return (cti >> 32n) & 0xFFFFn;
+}
+
+function
+cti_ledger_index(
+    cti)
+{
+    return (cti & 0xFFFFFFFFn);
+}
+
+function
+cti_ledger_check(
+    cti)
+{
+    return (cti >> 52n) & 0xFn;
+}
+
+function
+cti_transaction_check(
+    cti)
+{
+    return (cti >> 48n) & 0xFn;
+}
+
+function gofetch()
+{
+    document.getElementById('output').innerHTML = '';
+    let rawcti = document.getElementById('cti').value;
+    let cti = 0n;
+    try
+    {
+        cti = BigInt(rawcti);
+        if (cti > (2n**56n)-1n)
+            throw("");
+    }
+    catch(e)
+    {
+        document.getElementById('output').innerHTML = 'Invalid CTI';
+    }
+
+    let rawname = document.getElementById('nft').value;
+    if (rawname.length > 12)
+    {
+        document.getElementById('output').innerHTML = 'Name must be at most 12 chars'; 
+        return;
+    }
+
+    let namehex = '';
+
+    for (let i = 0; i < rawname.length; ++i)
+    {
+        let rawhexchar = rawname.charCodeAt(i).toString(16);
+        if (rawhexchar.length == 1)
+            rawhexchar = '0' + rawhexchar;
+        namehex += rawhexchar;
+    }
+
+    namehex += '0'.repeat(24 - namehex.length);
+
+    let ctihex = cti.toString(16);
+    document.getElementById('output').innerHTML = 'Your currency code: ' +
+        '02' + '0'.repeat(14-ctihex.length) + ctihex + namehex; 
+}
+    </script>
+    <h1>Use the box below to create an XLS14 currency code based on a CTI and 12 char NFT name</h1>
+        <input type="text" id="cti" placeholder="cti e.g. 67835576823535218"/>
+        <input type="text" id="nft" placeholder="the nft name"/>
+        <button onclick="gofetch()">GENERATE</button>
+
+        <br/><br/><blockquote id="output" style="white-space: pre; font-family:monospace; max-width:100vw; overflow-wrap: break-word;"></blockquote>
+    </body></html>
